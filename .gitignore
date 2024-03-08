@@ -1,0 +1,13 @@
+datasets/
+dlatents/
+out/
+training_runs/
+pretrained/
+video/
+_screenshots/
+
+.*jpg
+.*png
+~/
+
+__pycache__/
