@@ -19,7 +19,8 @@ import PIL.Image
 import torch
 
 import legacy
-
+from configurationLoader import returnRepoConfig
+repoConfig = returnRepoConfig('stylegan_cfg.yaml')
 #----------------------------------------------------------------------------
 
 def parse_range(s: Union[str, List]) -> List[int]:
@@ -67,16 +68,20 @@ def make_transform(translate: Tuple[float,float], angle: float):
     return m
 
 #----------------------------------------------------------------------------
-
+#Configs
+network_pkl = repoConfig.inference.model
+out_dir = repoConfig.inference.out_dir
+seeds = repoConfig.inference.seeds
+#----------------------------------------------------------------------------
 @click.command()
-@click.option('--network', 'network_pkl', help='Network pickle filename', required=True)
-@click.option('--seeds', type=parse_range, help='List of random seeds (e.g., \'0,1,4-6\')', required=True)
+@click.option('--network', 'network_pkl', default=network_pkl, help='Network pickle filename', required=True)
+@click.option('--seeds', type=parse_range, default=seeds, help='List of random seeds (e.g., \'0,1,4-6\')', required=True)
 @click.option('--trunc', 'truncation_psi', type=float, help='Truncation psi', default=1, show_default=True)
 @click.option('--class', 'class_idx', type=int, help='Class label (unconditional if not specified)')
 @click.option('--noise-mode', help='Noise mode', type=click.Choice(['const', 'random', 'none']), default='const', show_default=True)
 @click.option('--translate', help='Translate XY-coordinate (e.g. \'0.3,1\')', type=parse_vec2, default='0,0', show_default=True, metavar='VEC2')
 @click.option('--rotate', help='Rotation angle in degrees', type=float, default=0, show_default=True, metavar='ANGLE')
-@click.option('--outdir', help='Where to save the output images', type=str, required=True, metavar='DIR')
+@click.option('--outdir', help='Where to save the output images', default=out_dir, type=str, required=True, metavar='DIR')
 def generate_images(
     network_pkl: str,
     seeds: List[int],

@@ -1,0 +1,71 @@
+repo_name : StyleGan3
+
+filePaths:
+  current_repo: ${filePaths.repos_path}\\${repo_name}
+  stylegan_dataset_path: ${filePaths.dataset_folder_path}\\stylegan-dataset
+  
+datasetTool:
+  source: ${filePaths.img_dir}
+  # Prepping our dataset for StyleGAN
+  dest: ${filePaths.stylegan_dataset_path}
+  resolution: '512x512'
+
+inference:
+  model: 'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-afhqv2-512x512.pkl'
+  out_dir: ${inferencePaths.styleGAN_inference_output}
+  # TODO: make this random
+  seeds: '0-4'
+
+dir_to_project: ${inferencePaths.control_net_inference_output}
+# dir_to_project: ${inferencePaths.instDiff_inference_output}
+
+projector:
+  save_visualization : True
+  out_visualization_dir: ${inferencePaths.styleGAN_projector_output}\visualizations
+  out_image_dir: ${inferencePaths.styleGAN_projector_output}\images
+  out_latent_dir: ${inferencePaths.styleGAN_projector_output}\latents
+  steps: 1000
+  w_avg_samples: 10000
+  init_lr: 0.1
+  noise_weight_regularization: 0.00001
+  constant_lr: False
+  out_name_addon: '_proj'
+  
+mixing:
+  only_process_diagonal : True
+  save_grid : True
+  limit_grid_size : 10
+  #'Style layers to use; can pass "coarse", "middle", "fine", or a list or range of ints', default='0-6'
+  col_styles : '0-6'
+  #what do you want to style mix with
+  ref_image_dir: ${projector.out_latent_dir}
+  #what content is being mixed
+  content_image_dir: ${projector.out_latent_dir}
+  out_dir: ${inferencePaths.styleGAN_mixing_output}
+  out_name_addon: '_mixed'
+
+train:
+  description: "FullTrainFrontHorizontalFlipped"
+
+  #Point to the model to resume training
+  resume : null
+  cfg: 'stylegan2'
+  gpus: 1
+  workers: 6
+  mirror: True
+  kimg_training_duration: 25000
+  tick_frequency: 4
+  snapshot_frequency: 20
+  out_dir: 'training-runs'
+  dataset_path: ${datasetTool.dest}
+  batch_size: 16
+  resolution: 512
+
+  # # 0.0002 * resolution ** 2 / batch 
+  # StyleGAN heuristic formula for gamma parameter.
+  gamma: 10
+
+  map_depth : 2
+  cbase : 32768
+  glr : 0.0025
+  dlr : 0.0025

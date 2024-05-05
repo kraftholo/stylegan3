@@ -25,7 +25,8 @@ import click
 import numpy as np
 import PIL.Image
 from tqdm import tqdm
-
+from configurationLoader import returnRepoConfig
+repoConfig = returnRepoConfig('stylegan_cfg.yaml')
 #----------------------------------------------------------------------------
 
 def error(msg):
@@ -315,14 +316,18 @@ def open_dest(dest: str) -> Tuple[str, Callable[[str, Union[bytes, str]], None],
         return dest, folder_write_bytes, lambda: None
 
 #----------------------------------------------------------------------------
-
+# Config
+source = repoConfig.datasetTool.source
+dest = repoConfig.datasetTool.dest
+resolution = repoConfig.datasetTool.resolution
+#----------------------------------------------------------------------------
 @click.command()
 @click.pass_context
-@click.option('--source', help='Directory or archive name for input dataset', required=True, metavar='PATH')
-@click.option('--dest', help='Output directory or archive name for output dataset', required=True, metavar='PATH')
+@click.option('--source', help='Directory or archive name for input dataset', required=True, default=source, metavar='PATH')
+@click.option('--dest', help='Output directory or archive name for output dataset', required=True, default=dest, metavar='PATH')
 @click.option('--max-images', help='Output only up to `max-images` images', type=int, default=None)
 @click.option('--transform', help='Input crop/resize mode', type=click.Choice(['center-crop', 'center-crop-wide']))
-@click.option('--resolution', help='Output resolution (e.g., \'512x512\')', metavar='WxH', type=parse_tuple)
+@click.option('--resolution', help='Output resolution (e.g., \'512x512\')', default=resolution, metavar='WxH', type=parse_tuple)
 def convert_dataset(
     ctx: click.Context,
     source: str,
