@@ -2,7 +2,7 @@ repo_name : StyleGan3
 
 filePaths:
   current_repo: ${filePaths.repos_path}\\${repo_name}
-  stylegan_dataset_path: ${filePaths.dataset_folder_path}\\stylegan-dataset
+  stylegan_dataset_path: ${filePaths.dataset_folder_path}\stylegan-dataset
   
 datasetTool:
   source: ${filePaths.img_dir}
@@ -11,17 +11,16 @@ datasetTool:
   resolution: '512x512'
 
 inference:
-  model: 'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-afhqv2-512x512.pkl'
+  model: ${filePaths.current_repo}\training-runs\00003-stylegan2-stylegan-dataset-gpus1-batch16-gamma10-FullTrainFrontHorizontalFlipped\network-snapshot-001440.pkl
   out_dir: ${inferencePaths.styleGAN_inference_output}
   # TODO: make this random
-  seeds: '0-4'
 
 dir_to_project: ${inferencePaths.control_net_inference_output}
 # dir_to_project: ${inferencePaths.instDiff_inference_output}
 
 projector:
   save_visualization : True
-  out_visualization_dir: ${inferencePaths.styleGAN_projector_output}\visualizations
+  out_visualization_dir: ${inferencePaths.styleGAN_projector_output}\\visualizations
   out_image_dir: ${inferencePaths.styleGAN_projector_output}\images
   out_latent_dir: ${inferencePaths.styleGAN_projector_output}\latents
   steps: 1000
@@ -32,7 +31,7 @@ projector:
   out_name_addon: '_proj'
   
 mixing:
-  only_process_diagonal : True
+  only_process_diagonal : True # only process the diagonal of the grid (only mix reference image with one content image)
   save_grid : True
   limit_grid_size : 10
   #'Style layers to use; can pass "coarse", "middle", "fine", or a list or range of ints', default='0-6'
@@ -46,9 +45,8 @@ mixing:
 
 train:
   description: "FullTrainFrontHorizontalFlipped"
-
-  #Point to the model to resume training
-  resume : null
+  #Point to the model to resume training. Set to null to start from scratch
+  resume : ${train.out_dir}\00002-stylegan2-stylegan-dataset-gpus1-batch16-gamma10-FullTrainFrontHorizontalFlipped\network-snapshot-000960.pkl
   cfg: 'stylegan2'
   gpus: 1
   workers: 6
@@ -56,7 +54,7 @@ train:
   kimg_training_duration: 25000
   tick_frequency: 4
   snapshot_frequency: 20
-  out_dir: 'training-runs'
+  out_dir: ${filePaths.current_repo}\training-runs
   dataset_path: ${datasetTool.dest}
   batch_size: 16
   resolution: 512

@@ -11,3 +11,4 @@ _screenshots/
 ~/
 
 __pycache__/
+/training-runs

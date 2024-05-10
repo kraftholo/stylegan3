@@ -134,7 +134,6 @@ snapshot_frequency = repoConfig.train.snapshot_frequency
 outdir = repoConfig.train.out_dir
 data = repoConfig.train.dataset_path
 batch = repoConfig.train.batch_size
-resolution = repoConfig.train.resolution
 gamma = repoConfig.train.gamma 
 map_depth = repoConfig.train.map_depth
 cbase = repoConfig.train.cbase
@@ -145,10 +144,10 @@ dlr=repoConfig.train.dlr
 @click.command()
 
 # Required.
-@click.option('--outdir',       help='Where to save the results', metavar='DIR',                required=True)
+@click.option('--outdir',       help='Where to save the results', metavar='DIR',                default=outdir, required=True)
 @click.option('--cfg',          help='Base configuration',                                      type=click.Choice(['stylegan3-t', 'stylegan3-r', 'stylegan2']), default=cfg, required=True)
-@click.option('--data',         help='Training data', metavar='[ZIP|DIR]',                      type=str, required=True)
-@click.option('--gpus',         help='Number of GPUs to use', metavar='INT',                    type=click.IntRange(min=1), required=True)
+@click.option('--data',         help='Training data', metavar='[ZIP|DIR]',                      type=str, default=data, required=True)
+@click.option('--gpus',         help='Number of GPUs to use', metavar='INT',                    type=click.IntRange(min=1), default=gpus, required=True)
 @click.option('--batch',        help='Total batch size', metavar='INT',                         type=click.IntRange(min=1), default=batch, required=True)
 @click.option('--gamma',        help='R1 regularization weight', metavar='FLOAT',               type=click.FloatRange(min=0), default=gamma, required=True)
 

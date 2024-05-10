@@ -17,12 +17,12 @@ import dnnlib
 import numpy as np
 import PIL.Image
 import torch
+import random
 
 import legacy
 from configurationLoader import returnRepoConfig
 repoConfig = returnRepoConfig('stylegan_cfg.yaml')
 #----------------------------------------------------------------------------
-
 def parse_range(s: Union[str, List]) -> List[int]:
     '''Parse a comma separated list of numbers or ranges and return a list of ints.
 
@@ -68,14 +68,25 @@ def make_transform(translate: Tuple[float,float], angle: float):
     return m
 
 #----------------------------------------------------------------------------
+
+def random_seed_creator(value):
+    max_value = 2147483647
+    random_seeds = set()
+    while len(random_seeds) < value:
+        new_seed = random.randint(0, max_value)
+        random_seeds.add(new_seed)
+    return list(random_seeds)
+#----------------------------------------------------------------------------
 #Configs
 network_pkl = repoConfig.inference.model
 out_dir = repoConfig.inference.out_dir
-seeds = repoConfig.inference.seeds
+
+seeds = repoConfig.number_of_generated_images
+# seeds = repoConfig.inference.seeds
 #----------------------------------------------------------------------------
 @click.command()
 @click.option('--network', 'network_pkl', default=network_pkl, help='Network pickle filename', required=True)
-@click.option('--seeds', type=parse_range, default=seeds, help='List of random seeds (e.g., \'0,1,4-6\')', required=True)
+@click.option('--seeds', type=random_seed_creator, default=seeds, help='List of random seeds (e.g., \'0,1,4-6\')', required=True)
 @click.option('--trunc', 'truncation_psi', type=float, help='Truncation psi', default=1, show_default=True)
 @click.option('--class', 'class_idx', type=int, help='Class label (unconditional if not specified)')
 @click.option('--noise-mode', help='Noise mode', type=click.Choice(['const', 'random', 'none']), default='const', show_default=True)
